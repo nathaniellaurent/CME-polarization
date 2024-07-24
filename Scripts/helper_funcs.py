@@ -1,4 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 def calculateExitAngles(image_data_pB, image_data_tB, xConstraints, yConstraints ):
     xMin, xMax = xConstraints
@@ -19,6 +22,8 @@ def calculateExitAngles(image_data_pB, image_data_tB, xConstraints, yConstraints
     # plt.imshow(pBratioFull, origin='lower', norm=LogNorm())
     # plt.colorbar()
     for i in range(yMin,yMax):
+        if(i%50 == 0):
+            print(int(100*(i-yMin)/(yMax-yMin)), "% done")
         for j in range(xMin,xMax):
             y = np.abs(halfY - i)
             y = y*45/halfY
@@ -110,3 +115,29 @@ def subtractRadialMedian(image_data, median_values):
     # plt.imshow(image_data - imageSubtract, origin='lower', norm=LogNorm())
 
     return image_data - imageSubtract
+
+
+def minSmooth(image_data, kernel_size):
+    for i in range(len(image_data)):
+        for j in range(len(image_data[0])):
+            if(image_data[i][j] == 0):
+                image_data[i][j] = 100
+    height, width = image_data.shape
+    imageSubtract = np.zeros((height, width))
+    for i in range(height):
+        if(i%100 == 0):
+            print(int(100*i/height), "% done")
+        for j in range(width):
+            subImage = image_data[max(0,i - kernel_size//2):min(height-1,i+kernel_size//2),max(0,j - kernel_size//2):min(width-1,j+kernel_size//2)]
+            minVal = np.amin(subImage)
+            imageSubtract[i][j] = minVal
+    for i in range(len(image_data)):
+        for j in range(len(image_data[0])):
+            if(image_data[i][j] == 100):
+                image_data[i][j] = 0
+    # plt.figure()
+    # plt.imshow(imageSubtract, origin='lower', norm=LogNorm())
+
+    return image_data - imageSubtract
+
+
