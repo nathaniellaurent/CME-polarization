@@ -18,12 +18,20 @@ image_data_tB2 = fits_file_tB2[0].data
 
 plt.figure()
 plt.imshow(image_data_pB, origin='lower', norm=LogNorm())
+plt.colorbar()
 
-smoothImage = minSmooth(image_data_pB,200)
+smoothImage = minSmooth(image_data_pB,50)
+radialImage = subtractRadialMedian(image_data_pB, calculate_median_pixel_values(image_data_pB))
 print("Initial: ",image_data_pB[776][205])
 print("Smoothed: ", smoothImage[776][205])
+print("Radial: ", radialImage[776][205])
+
+plt.figure()
+plt.imshow(radialImage, origin='lower', norm=LogNorm())
+plt.colorbar()
 
 plt.figure()
 plt.imshow(smoothImage, origin='lower', norm=LogNorm())
+plt.colorbar()
 
 plt.show()

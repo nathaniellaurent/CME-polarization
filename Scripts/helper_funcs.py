@@ -21,29 +21,37 @@ def calculateExitAngles(image_data_pB, image_data_tB, xConstraints, yConstraints
     # plt.figure()
     # plt.imshow(pBratioFull, origin='lower', norm=LogNorm())
     # plt.colorbar()
-    for i in range(yMin,yMax):
-        if(i%50 == 0):
-            print(int(100*(i-yMin)/(yMax-yMin)), "% done")
-        for j in range(xMin,xMax):
-            y = np.abs(halfY - i)
-            y = y*45/halfY
+    for i in range(1024):
+        
+        # if(i%50 == 0):
+        #     print(int(100*(i-yMin)/(yMax-yMin)), "% done")
+        for j in range(1024):
+            if( i < yMax and i >= yMin and j < xMax and j >= xMin):
+                y = np.abs(halfY - i)
+                y = y*45/halfY
 
-            x = np.abs(halfX- j)
-            x = x*45/halfX
-            
-            epsilon = np.sqrt(x*x + y*y)
-            # print(epsilon)
-            if(image_data_tB[i][j] > 0):
-                pBratio = pBratioFull[i][j]
+                x = np.abs(halfX- j)
+                x = x*45/halfX
                 
-                angleMatrixPositive[i][j] = epsilon + np.rad2deg(np.arcsin(np.sqrt((1 - pBratio)/(1 + pBratio))))
-                angleMatrixNegative[i][j] = epsilon + np.rad2deg(np.arcsin(-np.sqrt((1 - pBratio)/(1 + pBratio))))
-
+                epsilon = np.sqrt(x*x + y*y)
+                # print(epsilon)
+                if(image_data_tB[i][j] > 0):
+                    pBratio = pBratioFull[i][j]
+                    "using arccos"
+                    
+                    angleMatrixPositive[i][j] = epsilon + np.rad2deg(np.arcsin(np.sqrt((1 - pBratio)/(1 + pBratio))))
+                    angleMatrixNegative[i][j] = epsilon + np.rad2deg(np.arcsin(-np.sqrt((1 - pBratio)/(1 + pBratio))))
+                    # angleMatrixPositive[i][j] = np.rad2deg(np.arccos(np.sqrt((1 - pBratio)/(1 + pBratio))))
+                    # angleMatrixNegative[i][j] = np.rad2deg(np.arccos(-np.sqrt((1 - pBratio)/(1 + pBratio))))
+            else: 
+                angleMatrixPositive[i][j] = 0
+                angleMatrixNegative[i][j] = 0
+        
     print("positive: ", angleMatrixPositive[512][645])
     print("negative: ", angleMatrixNegative[512][645])
     return angleMatrixPositive, angleMatrixNegative
 
-def calculate_median_pixel_values(image_data):
+def calculateRadialBands(image_data):
     # Get the dimensions of the image
     height, width = image_data.shape
 
@@ -55,25 +63,28 @@ def calculate_median_pixel_values(image_data):
     max_radius = int(np.sqrt(center_x**2 + center_y **2)) +1 
 
     # Initialize an empty list to store the median pixel values
-    median_values = []
-
+    
+    allIndices = []
     # Iterate over the different bands of radius
     for radius in range(5, max_radius + 1, 5):
         
         # Calculate the indices of the pixels within the current band of radius
         greater = np.sqrt((np.arange(height)[:, np.newaxis] - center_y) ** 2 +
-                          (np.arange(width) - center_x) ** 2) <= radius
+                          (np.arange(width) - center_x) ** 2) < radius
         # plt.figure()
         # plt.imshow(greater)
         less = np.sqrt((np.arange(height)[:, np.newaxis] - center_y) ** 2 +
-                       (np.arange(width) - center_x) ** 2) > radius - 5
+                       (np.arange(width) - center_x) ** 2) >= radius - 5
         
         sides = (np.arctan(np.abs(np.arange(height)[:, np.newaxis] - center_y)/
                            np.abs(np.arange(width) - center_x))) < (90-22.5)*np.pi/180
+        right = (0*(np.arange(height)[:, np.newaxis] - center_y)  +
+                       (np.arange(width) - center_x)) > 0
         # print(sides)
 
         greaterLess = np.logical_and(greater, less)
         both = np.logical_and(greaterLess, sides)  
+        both = np.logical_and(both, right)
 
         # if(radius%500 == 0):
         #     plt.figure()
@@ -83,17 +94,26 @@ def calculate_median_pixel_values(image_data):
         # print(less)
 
         indices = np.where(both)
+        allIndices.append(indices)
         # print(indices)
 
         # Extract the pixel values within the current band of radius
-        pixels = image_data[indices]
+        
+    
+    return allIndices
+def calculateMedianPixelValues(image_data, allIndices):
+    median_values = []
 
+    for indices in allIndices:
+        
+
+        pixels = image_data[indices]
         # Calculate the median pixel value
         median_value = np.quantile(pixels,0.5)
 
         # Append the median value to the list
         median_values.append(median_value)
-
+    
     return median_values
 
 def subtractRadialMedian(image_data, median_values):
@@ -141,3 +161,17 @@ def minSmooth(image_data, kernel_size):
     return image_data - imageSubtract
 
 
+def blurImage(image_data, kernel_size):
+    height, width = image_data.shape
+    imageSubtract = np.zeros((height, width))
+    for i in range(height):
+        if(i%100 == 0):
+            print(int(100*i/height), "% done")
+        for j in range(width):
+            subImage = image_data[max(0,i - kernel_size//2):min(height-1,i+kernel_size//2),max(0,j - kernel_size//2):min(width-1,j+kernel_size//2)]
+            avgVal = np.mean(subImage)
+            imageSubtract[i][j] = avgVal
+    # plt.figure()
+    # plt.imshow(imageSubtract, origin='lower', norm=LogNorm())
+
+    return imageSubtract

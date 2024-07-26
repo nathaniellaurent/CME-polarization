@@ -95,13 +95,14 @@ vmax = 80
 # plt.show()
 
 
-fig, axs = plt.subplots(3,len(pBdata),figsize=(15, 20), sharex=True, sharey=True)
+fig, axs = plt.subplots(4,len(pBdata),figsize=(15, 20), sharex=True, sharey=True)
 
 
 for i in range(len(pBdata)): 
     axs[0,i].imshow(posMats[i][yMin:yMax,xMin:xMax], origin='lower', vmin=vmin, vmax=vmax, cmap='hsv')
     axs[1,i].imshow(pBdata[i][yMin:yMax,xMin:xMax], origin='lower', norm=LogNorm())
-    im = axs[2,i].imshow(negMats[i][yMin:yMax,xMin:xMax], origin='lower', vmin=vmin, vmax=vmax, cmap='hsv')
+    axs[2,i].imshow(tBdata[i][yMin:yMax,xMin:xMax], origin='lower', norm=LogNorm())
+    im = axs[3,i].imshow(negMats[i][yMin:yMax,xMin:xMax], origin='lower', vmin=vmin, vmax=vmax, cmap='hsv')
 
 
 # fig, axs = plt.subplots(2,6,figsize=(15, 20), sharex=True, sharey=True)
@@ -126,7 +127,7 @@ negMatsGraph = np.zeros(len(negMatsData))
 # Show the plot
 
 fig.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
-cbar_ax = fig.add_axes([0.1, 0.1, 0.8, 0.05])
+cbar_ax = fig.add_axes([0.1, 0.05, 0.8, 0.05])
 fig.colorbar(im, cax=cbar_ax, orientation='horizontal')
 
 for i in range(len(posMatsData)):
