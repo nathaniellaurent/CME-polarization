@@ -7,8 +7,8 @@ import mplcursors
 from helper_funcs import *
 
 
-fits_file_pB = fits.open('CME_0_pB\stepnum_015.fits')
-fits_file_tB = fits.open('CME_0_tB\stepnum_015.fits')
+fits_file_pB = fits.open('CME_0_pB_+50\stepnum_045.fits')
+fits_file_tB = fits.open('CME_0_tB_+50\stepnum_045.fits')
 fits_file_pB2 = fits.open('CME_0_pB\stepnum_020.fits')
 fits_file_tB2 = fits.open('CME_0_tB\stepnum_020.fits')
 
@@ -28,10 +28,10 @@ print("total: ", totalB)
 
 # print(image_data_pB)
 # print(image_data_tB)
-print("pB: ", image_data_pB[509][610])
-print("pB sub: ", image_data_pB[443][581])
-print("tB: ",image_data_tB[509][610])
-print("tB sub: ",image_data_tB[443][581])
+print("pB: ", image_data_pB[518][695])
+print("pB sub: ", image_data_pB[519][730])
+print("tB: ",image_data_tB[518][695])
+print("tB sub: ",image_data_tB[519][730])
 
 plt.figure()
 plt.imshow(image_data_tB, origin='lower', norm=LogNorm())
