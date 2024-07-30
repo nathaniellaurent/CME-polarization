@@ -125,13 +125,13 @@ def calculateMedianPixelValues(image_data, allIndices):
         median_values[index] = median_value
     # print(median_values)
 
-    print(len(median_values))
+    # print(len(median_values))
     r_values = np.array(range(5, len(median_values)*5 + 1, 5))
-    print(len(r_values))
+    # print(len(r_values))
     return median_values, r_values
 
 def subtractRadialMedian(image_data, median_values):
-    print(median_values)
+    # print(median_values)
     height, width = image_data.shape
     imageSubtract = np.zeros((height, width))
     for i in range(height):
@@ -241,6 +241,7 @@ def inverseR2(x,a,b):
     return a/(x**3) + b
 
 def functionFitSubtract(image_data, point, direction='right'):
+    print(point)
     if(direction == 'right'):
         median_values = image_data[512,512:1024]
         
@@ -250,7 +251,32 @@ def functionFitSubtract(image_data, point, direction='right'):
     
 
     #find first nonzero value of median_values
-    median_values = np.flip(median_values)
+    
+
+    # Find the second index of the point
+    
+
+    # Remove values within 100 of the second index
+    print("ignoring: ", max(25,int(0.3*abs(point[1]-512))))
+    interval =  max(25,int(0.3*abs(point[1]-512)))
+    print("start: ", point[1] - 512 - interval)
+    print("end: ", point[1] - 512 + interval)
+    delete = np.arange(point[1] - 512 - interval, point[1] - 512 + interval)
+    print(delete)
+    
+    r_values_old = r_values
+    median_values_old = median_values
+
+    plt.figure()
+    plt.plot(r_values,median_values, 'o')
+    r_values = np.delete(r_values, delete )
+    median_values = np.delete(median_values, delete)
+    
+    plt.plot(r_values,median_values,'o')
+    plt.show()
+
+    if(direction == 'left'):
+        median_values = np.flip(median_values)
     firstNonZero = 0
     for j in range(len(median_values)):
         if median_values[j] != 0:
@@ -260,15 +286,14 @@ def functionFitSubtract(image_data, point, direction='right'):
     median_values = median_values[firstNonZero+2:]
     r_values = r_values[firstNonZero+2:]
 
-    # Find the second index of the point
-    
+    firstNonZero_old = 0
+    for j in range(len(median_values_old)):
+        if median_values_old[j] != 0:
+            firstNonZero_old = j
+            break
 
-    # Remove values within 100 of the second index
-    delete = np.where(np.abs(r_values - (abs(point[1] - 512))) <= 50)
-    r_values_old = r_values
-    median_values_old = median_values
-    r_values = np.delete(r_values, delete )
-    median_values = np.delete(median_values, delete)
+    median_values_old = median_values_old[firstNonZero_old+2:]
+    r_values_old = r_values_old[firstNonZero_old+2:]
 
    
 
@@ -287,6 +312,7 @@ def functionFitSubtract(image_data, point, direction='right'):
     plt.plot(r_values,median_values)
     plt.plot(r_values_old,median_values_old)
     plt.plot(r_values_old,fit_y)
+    plt.plot(abs(point[1] - 512), image_data[point[0],point[1]], 'ro')
     
     plt.show()
     print("Subtracting ", inverseR2(abs(point[1] - 512), parameters[0], parameters[1]), " from ", image_data[point[0],point[1]])

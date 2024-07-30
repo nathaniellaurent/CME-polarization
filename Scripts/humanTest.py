@@ -7,12 +7,12 @@ import mplcursors
 from helper_funcs import *
 
 
-fits_file_pB = fits.open('CME_0_pB_+50\stepnum_045.fits')
-fits_file_tB = fits.open('CME_0_tB_+50\stepnum_045.fits')
+fits_file_pB = fits.open('CME_0_pB\stepnum_035.fits')
+fits_file_tB = fits.open('CME_0_tB\stepnum_035.fits')
 fits_file_pB2 = fits.open('CME_0_pB\stepnum_020.fits')
 fits_file_tB2 = fits.open('CME_0_tB\stepnum_020.fits')
 
-image_data_pB = 2*fits_file_pB[0].data - fits_file_tB[0].data
+image_data_pB = fits_file_pB[0].data 
 image_data_tB = fits_file_tB[0].data
 image_data_pB2 = fits_file_pB2[0].data
 image_data_tB2 = fits_file_tB2[0].data
