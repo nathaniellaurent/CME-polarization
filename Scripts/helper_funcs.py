@@ -309,7 +309,7 @@ def functionFitSubtract(image_data, point, direction='right'):
     # print(fit_y)
 
     plt.figure()
-    plt.plot(r_values,median_values)
+    # plt.plot(r_values,median_values)
     plt.plot(r_values_old,median_values_old)
     plt.plot(r_values_old,fit_y)
     plt.plot(abs(point[1] - 512), image_data[point[0],point[1]], 'ro')
