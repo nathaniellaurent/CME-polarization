@@ -325,3 +325,31 @@ def medianOverTime(image_data_list):
     image_data_list = np.stack(image_data_list, axis=0)
 
     return np.quantile(image_data_list, 0.5, axis=0)
+
+
+# Subtract the median of each band of radius from the image data
+def subtractRadialMedianOther(image_data, median_values, allIndices):
+    # print(median_values)
+    height, width = image_data.shape
+    # imageSubtract = np.zeros((height, width))
+    # for i in range(height):
+    #     for j in range(width):
+    #         radius = np.sqrt((i - height//2)**2 + (j - width//2)**2)
+    #         if(radius < 55):
+    #             continue
+    #         lower = int(radius//5)
+    #         upper = lower + 1
+    #         if upper < len(median_values):
+    #             lower_median = median_values[lower]
+    #             upper_median = median_values[upper]
+    #             weight = (radius/5) - lower
+    #             imageSubtract[i][j] = (1-weight)*lower_median + weight*upper_median
+    #         else:
+    #             imageSubtract[i][j] = median_values[-1]
+
+    for index in range(len(allIndices)):
+        image_data[allIndices[index]] = image_data[allIndices[index]] -  median_values[index]
+
+    # plt.figure()
+    # plt.imshow(imageSubtract, origin='lower', norm=LogNorm())
+    # plt.show()
