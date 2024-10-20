@@ -215,7 +215,7 @@ def functionFitSubtract(image_data, point, direction='right'):
     # Remove values within 100 of the second index (the goal of this is to not fit to the CME)
 
     print("ignoring: ", max(25,int(0.3*np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2))))
-    interval =  max(25,int(0.1*np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2)))
+    interval =  max(25,int(0.2*np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2)))
     print("start: ", point[1] - 512 - interval)
     print("end: ", point[1] - 512 + interval)
     delete = np.where(np.logical_and(r_values > np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2) - interval, r_values < np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2) + interval))
