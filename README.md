@@ -29,4 +29,5 @@ Scripts_CME_0
 
     - Contains functions for analytic inversion and background subtraction used in CME_benchmark
 
-Scripts_CME_0_Isolated (same as Scripts_CME_0 with isolated CME images)
+Scripts_CME_0_Isolated 
+- (Same as Scripts_CME_0, but with isolated CME images)
