@@ -11,6 +11,7 @@ Under both of these folders there are 3 key python analysis files
 
 
 CME_Trajectory_Poster.pdf
+- Description of this project, conclusions, and scientific background
 
 Scripts_CME_0
 - CME_benchmark (jupyter notebook)
