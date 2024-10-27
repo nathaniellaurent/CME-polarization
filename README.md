@@ -1,5 +1,5 @@
 # PUNCH CME Trajectory Determination 
-This project is for independent researach through Southwest Research Institute for the NASA PUNCH Solar Mission.
+This project is for independent research through Southwest Research Institute for the NASA PUNCH Solar Mission.
 
 See accompanying CME_Trajectory_Poster.pdf for the description of the project.
 
