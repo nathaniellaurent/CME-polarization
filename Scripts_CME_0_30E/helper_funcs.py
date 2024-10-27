@@ -34,15 +34,15 @@ def calculateExitAngles(image_data_pB, image_data_tB, xConstraints, yConstraints
                     epsilonPoint = epsilon
                 
                 
-                if(image_data_tB[i][j] > 0):
-                    pBratio = pBratioFull[i][j]
-                    
-                    if(type == 'Xi'):
-                        angleMatrixPositive[i][j] = epsilon + np.rad2deg(np.arcsin(np.sqrt((1 - pBratio)/(1 + pBratio))))
-                        angleMatrixNegative[i][j] = epsilon + np.rad2deg(np.arcsin(-np.sqrt((1 - pBratio)/(1 + pBratio))))
-                    if(type == 'Chi'):
-                        angleMatrixPositive[i][j] = np.rad2deg(np.arccos(np.sqrt((1 - pBratio)/(1 + pBratio))))
-                        angleMatrixNegative[i][j] = np.rad2deg(np.arccos(-np.sqrt((1 - pBratio)/(1 + pBratio))))
+                    if(image_data_tB[i][j] > 0):
+                        pBratio = pBratioFull[i][j]
+                        
+                        if(type == 'Xi'):
+                            angleMatrixPositive[i][j] = epsilon + np.rad2deg(np.arcsin(np.sqrt((1 - pBratio)/(1 + pBratio))))
+                            angleMatrixNegative[i][j] = epsilon + np.rad2deg(np.arcsin(-np.sqrt((1 - pBratio)/(1 + pBratio))))
+                        if(type == 'Chi'):
+                            angleMatrixPositive[i][j] = np.rad2deg(np.arccos(np.sqrt((1 - pBratio)/(1 + pBratio))))
+                            angleMatrixNegative[i][j] = np.rad2deg(np.arccos(-np.sqrt((1 - pBratio)/(1 + pBratio))))
 
 
             else: 
@@ -52,14 +52,19 @@ def calculateExitAngles(image_data_pB, image_data_tB, xConstraints, yConstraints
     return angleMatrixPositive, angleMatrixNegative, epsilonPoint
 
 
-def inverseR3(x,a,b,p):
+
+
+
+
+
+def inverseR3(x,a,b):
     
-    return a/(x**p) + b
+    return a/(x**3) + b
 
-def functionFitSubtract(image_data, point, direction='right'):
+def functionFitSubtract(image_data, point, direction='right', save=False):
     #input 'point' is the only point that will be subtracted from
-
-    print(point)
+    if(save):
+        print(point)
 
     line = lambda x, a, b: a*x + b
 
@@ -84,48 +89,46 @@ def functionFitSubtract(image_data, point, direction='right'):
     
 
     
-    y_values = line(x_values, parameters[0], parameters[1])
-    
-   
-
+    y_values = line(x_values, *parameters)
     r_values = np.sqrt((y_values - 512)**2 + (x_values - 512)**2)
     over_512 = np.where(r_values > 512)
     r_values = np.delete(r_values, over_512)
     x_values = np.delete(x_values, over_512)
     y_values = np.delete(y_values, over_512)
-
-    plt.figure()
-    plt.plot(x_values,y_values)
-    plt.plot(point[1],point[0],'ro')
-    plt.show()
     median_values = image_data[y_values.astype(int),x_values.astype(int)]
 
-    print("r_values: ", r_values)
-    print("median_values: ", median_values)
-    print("x_values: ", x_values)
-    print("y_values: ", y_values)
+    # if(save):
+        # print("r_values: ", r_values)
+        # print("median_values: ", median_values)
+        # print("x_values: ", x_values)
+        # print("y_values: ", y_values)
 
 
     
     # Remove values within 100 of the second index (the goal of this is to not fit to the CME)
 
-    print("ignoring: ", max(25,int(0.3*np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2))))
     interval =  max(25,int(0.5*np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2)))
-    print("start: ", point[1] - 512 - interval)
-    print("end: ", point[1] - 512 + interval)
+    if(save):
+        print("ignoring: ", max(25,int(0.5*np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2))))
+        print("start: ", point[1] - 512 - interval)
+        print("end: ", point[1] - 512 + interval)
+
     delete = np.where(np.logical_and(r_values > np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2) - interval, r_values < np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2) + interval))
     # print(delete)
     
     r_values_old = r_values
     median_values_old = median_values
 
-    plt.figure()
-    plt.plot(r_values,median_values, 'o')
+    if(save):
+        plt.figure()
+        plt.plot(r_values,median_values, 'o')
+    
     r_values = np.delete(r_values, delete )
     median_values = np.delete(median_values, delete)
-    
-    plt.plot(r_values,median_values,'o')
-    plt.show()
+
+    if(save): 
+        plt.plot(r_values,median_values,'o')
+        plt.show()
 
     if(direction == 'left'):
         median_values = np.flip(median_values)
@@ -155,22 +158,37 @@ def functionFitSubtract(image_data, point, direction='right'):
     parameters, covariance = curve_fit(inverseR3, r_values, median_values)
 
     # print the parameters of the fit function a/(x^3) + b
-    print("a: ", parameters[0], "b: ", parameters[1], "p: ", parameters[2])
-   
+    if(save):
+        print("a: ", parameters[0], "b: ", parameters[1])
+    
     fit_y = inverseR3(r_values_old, *parameters)
     
     # print(fit_y)
 
-    plt.figure()
-    plt.plot(r_values,median_values)
-    plt.plot(r_values_old,median_values_old)
-    plt.plot(r_values_old,fit_y)
-    plt.plot(np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2), image_data[point[0],point[1]], 'ro')
     
-    plt.show()
+    # plt.yscale('log')
+    if(save):
+        plt.savefig('fit.png', dpi=300)
+        plt.figure()
+
+        # plt.plot(r_values,median_values, label='Original Data')
+        plt.plot(r_values_old,median_values_old, label='Original Data')
+        plt.plot(r_values_old,fit_y, label='Fit Curve')
+        plt.legend(fontsize="13")
+        
+        plt.plot(np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2), image_data[point[0],point[1]], 'ro')
+        plt.xlabel('Radius (pixels)')
+        plt.ylabel('Pixel Value')
+        plt.show()
+
+    
+    
+   
 
     #evaluate the function at the point and subtract it from the image data
-    print("Subtracting ", inverseR3(np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2), *parameters), " from ", image_data[point[0],point[1]])
+    if(save):   
+        print("Subtracting ", inverseR3(abs(point[1] - 512), *parameters), " from ", image_data[point[0],point[1]])
     image_data[point[0],point[1]] = image_data[point[0],point[1]] - inverseR3(np.sqrt((point[1] - 512)**2 + (point[0]- 512)**2),*parameters)
 
     return image_data
+
