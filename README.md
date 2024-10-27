@@ -29,18 +29,4 @@ Scripts_CME_0
 
     - Contains functions for analytic inversion and background subtraction used in CME_benchmark
 
-Scripts_CME_0_Isolated
-- CME_benchmark (jupyter notebook)
-
-    - Imports polarized and unpolarized (pb/B) images
-    - Performs background subtraction
-    - Plots results and outputs to files
-
-- CME_correction (jupyter notebook)
-
-    - Performs perspective correction calculations outputted by CME_benchmark
-    - Plots results before and after correction
-
-- helper_funcs (python file)
-
-    - Contains functions for analytic inversion and background subtraction used in CME_benchmark
+Scripts_CME_0_Isolated (same as Scripts_CME_0 with isolated CME images)
